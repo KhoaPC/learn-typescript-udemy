@@ -1,18 +1,18 @@
-// const c = console.log;
+const c = console.log;
 
 function add(n1: number, n2: number) {
     return n1 + n2;
 }
 
-// function printResult(any): void {
-    // console.log(`Result ${any}`);
-// }
+function printResult(any): void {
+    c(`Result ${any}`);
+}
 
 let func: (a: number, b: number) => number;
 func = add;
 // func = printResult; //Error
 
-// c(func(1,9));
+c(func(1,9));
 
 function addAndHandles(
     n1: number,
@@ -25,6 +25,6 @@ function addAndHandles(
 }
 
 addAndHandles(10, 10, (result, result2) => {
-    c(result - result2);
-    return;
+    c(result * result2);
+    // return;
 });
