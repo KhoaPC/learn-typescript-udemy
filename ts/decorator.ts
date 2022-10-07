@@ -17,10 +17,15 @@ function Logger3(target: any, name: string | symbol, position: number) {
 
 function WithTemplate(template: string, id: string) {
     return function<T extends {new(...arg: any[]): {}}>(constructor: T) {
+      
         return class extends constructor {
+
             constructor(...arg: any[]) {
+
                 super();
+
                 const elm = document.getElementById(id);
+
                 if (elm) {
                     elm.innerText = template;
                 }
@@ -34,12 +39,10 @@ class Person {
     @Logger1
     name: string;
     age: number;
-    constructor(n: string, @Logger3 a: number) {
+    constructor(n: string, a: number) {
         this.name = n;
         this.age = a;
     }
-
-    @Logger2
     getYearOfBirth() {
         const date = new Date();
         const year = date.getFullYear();
@@ -49,7 +52,7 @@ class Person {
 // const per = new Person('Khoa', 16);
 
 
-//
+
 // interface ValidatorConfig {
 //     [property: string]: {
 //       [validatableProp: string]: string[]; // ['required', 'positive']
@@ -58,6 +61,7 @@ class Person {
   
 // const registeredValidators: ValidatorConfig = {};
  
+// array spread operator
 // function Required(target: any, propName: string) {
 //     registeredValidators[target.constructor.name] = {
 //         ...registeredValidators[target.constructor.name],
@@ -65,7 +69,7 @@ class Person {
 //     };
 // }
  
-// function PositiveNumber(target: any, propName: string) {
+// function PositiveNumber(target:t any, propName: string) {
 //     registeredValidators[target.constructor.name] = {
 //         ...registeredValidators[target.constructor.name],
 //         [propName]: [...(registeredValidators[target.constructor.name]?.[propName] ?? []), 'positive']
@@ -93,33 +97,33 @@ class Person {
 //     return isValid;
 //   }
   
-  class User {
-    // @Required
-    name: string;
-    // @PositiveNumber
-    age: number;
+//   class User {
+//     // @Required
+//     name: string;
+//     // @PositiveNumber
+//     age: number;
   
-    constructor(name: string, age: number) {
-      this.name = name;
-      this.age = age;
-    }
-  }
+//     constructor(name: string, age: number) {
+//       this.name = name;
+//       this.age = age;
+//     }
+//   }
   
-  const courseForm = document.querySelector('form')!;
-  courseForm.onsubmit = (e) => {
-    e.preventDefault();
-    const nameEl = document.getElementById('name') as HTMLInputElement;
-    const ageEl = document.getElementById('age') as HTMLInputElement;
+//   const courseForm = document.querySelector('form')!;
+//   courseForm.onsubmit = (e) => {
+//     e.preventDefault();
+//     const nameEl = document.getElementById('name') as HTMLInputElement;
+//     const ageEl = document.getElementById('age') as HTMLInputElement;
   
-    const name = nameEl.value;
-    const age = +ageEl.value;
+//     const name = nameEl.value;
+//     const age = +ageEl.value;
   
-    const createdUser = new User(name, age);
+//     const createdUser = new User(name, age);
   
-    // if (!validate(createdUser)) {
-    //   alert('Invalid input, please try again!');
-    //   return;
-    // }
-    c(createdUser);
-  };
+//     // if (!validate(createdUser)) {
+//     //   alert('Invalid input, please try again!');
+//     //   return;
+//     // }
+//     c(createdUser);
+//   };
   
