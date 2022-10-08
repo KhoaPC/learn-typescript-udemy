@@ -1,140 +1,128 @@
 const c = console.log;
-// Decorator
-function Logger1(target: any, propertyName: string | symbol) {
-    c(target, propertyName);
+
+// class decorator
+function setProperty(ctr: Function) {
+    ctr.prototype.id = Math.random().toString();
+    ctr.prototype.dateCreated = new Date().toLocaleString();
 }
 
-function Logger2(target: any, name: string | symbol, descriptor: PropertyDescriptor) {
-    c(target);
-    c(name);
-    c(descriptor);
+@setProperty
+class User {
+    constructor(public name: string) { }
 }
 
-function Logger3(target: any, name: string | symbol, position: number) {
-    c(target);
-    c(position);
-}
+const user1 = new User('Khoa');
+// c(user1);
 
-function WithTemplate(template: string, id: string) {
-    return function<T extends {new(...arg: any[]): {}}>(constructor: T) {
-      
-        return class extends constructor {
-
-            constructor(...arg: any[]) {
-
-                super();
-
-                const elm = document.getElementById(id);
-
-                if (elm) {
-                    elm.innerText = template;
-                }
-            }
+// method decorator
+function autoBind(target: any, methodName: string, descriptor: PropertyDescriptor) {
+    const originalMethod = descriptor.value;
+    const adjDescripttor: PropertyDescriptor = {
+        configurable: true,
+        enumerable: false,
+        get() {
+            const boundFn = originalMethod.bind(this);
+            return boundFn;
         }
     }
-}
+    return adjDescripttor;
+} // autoBind
 
-@WithTemplate('Person', 'app')
 class Person {
-    @Logger1
-    name: string;
-    age: number;
+    private name: string;
+    private age: number;
+
     constructor(n: string, a: number) {
         this.name = n;
         this.age = a;
     }
-    getYearOfBirth() {
-        const date = new Date();
-        const year = date.getFullYear();
-        c(year - this.age);
+    @autoBind
+    getName() {
+        c(this.name);
     }
 }
-// const per = new Person('Khoa', 16);
+
+const person1 = new Person('Khoa', 16);
+person1.getName()
 
 
+// Property decorator
+function propertyChange(target: any, key: string) {
 
-// interface ValidatorConfig {
-//     [property: string]: {
-//       [validatableProp: string]: string[]; // ['required', 'positive']
-//     };
-//   }
-  
-// const registeredValidators: ValidatorConfig = {};
- 
-// array spread operator
-// function Required(target: any, propName: string) {
-//     registeredValidators[target.constructor.name] = {
-//         ...registeredValidators[target.constructor.name],
-//         [propName]: [...(registeredValidators[target.constructor.name]?.[propName] ?? []), 'required']
-//     };
-// }
- 
-// function PositiveNumber(target:t any, propName: string) {
-//     registeredValidators[target.constructor.name] = {
-//         ...registeredValidators[target.constructor.name],
-//         [propName]: [...(registeredValidators[target.constructor.name]?.[propName] ?? []), 'positive']
-//     };
-// }
-  
-//   function validate(obj: any) {
-//     const objValidatorConfig = registeredValidators[obj.constructor.name];
-//     if (!objValidatorConfig) {
-//       return true;
-//     }
-//     let isValid = true;
-//     for (const prop in objValidatorConfig) {
-//       for (const validator of objValidatorConfig[prop]) {
-//         switch (validator) {
-//           case 'required':
-//             isValid = isValid && !!obj[prop];
-//             break;
-//           case 'positive':
-//             isValid = isValid && obj[prop] > 0;
-//             break;
-//         }
-//       }
-//     }
-//     return isValid;
-//   }
-  
-//   class User {
-//     // @Required
-//     name: string;
-//     // @PositiveNumber
-//     age: number;
-  
-//     constructor(name: string, age: number) {
-//       this.name = name;
-//       this.age = age;
-//     }
-//   }
-  
-//   const courseForm = document.querySelector('form')!;
-//   courseForm.onsubmit = (e) => {
-//     e.preventDefault();
-//     const nameEl = document.getElementById('name') as HTMLInputElement;
-//     const ageEl = document.getElementById('age') as HTMLInputElement;
-  
-//     const name = nameEl.value;
-//     const age = +ageEl.value;
-  
-//     const createdUser = new User(name, age);
-  
-//     // if (!validate(createdUser)) {
-//     //   alert('Invalid input, please try again!');
-//     //   return;
-//     // }
-//     c(createdUser);
-//   };
-  
-// function autoBind(target: any, methodName: string, descriptor: PropertyDescriptor) {
-//     const originalMethod = descriptor.value;
-//     const adjDescripttor: PropertyDescriptor = {
-//         configurable: true,
-//         get() {
-//             const boundFn = originalMethod.bind(this);
-//             return boundFn;
-//         }
-//     }
-//     return adjDescripttor;
-// } 
+    let result = target[key];
+
+    const getFunc = function () {
+        return result;
+    };
+
+    const setFunc = function (newResult: string) {
+        result = `Hello ${newResult}`;
+
+        return result;
+    };
+
+    const description = {
+        enumerable: true,
+        configurable: true,
+        get: getFunc,
+        set: setFunc
+    }
+
+    Object.defineProperty(target, key, description);
+}
+
+class PersonX {
+    public firstname: string = 'Luong';
+
+    @propertyChange
+    public lastName: string = "Khoa";
+}
+
+const employeeInstance = new PersonX();
+// c(employeeInstance);
+
+
+// accessor decorator
+function Enumerable(target: any, propertyKey: string, descriptor: PropertyDescriptor) {
+    Object.defineProperty(target, `_${propertyKey}`, {
+        writable: true
+    });
+}
+
+class PersonN {
+    _name: string;
+    
+    constructor(name: string) {
+        this._name = name;
+    }
+
+    @Enumerable
+    get name() {
+        return this._name;
+    }
+}
+
+let person = new PersonN("Khoa");
+person._name = 'Tèo';
+// c(person);
+
+
+// parameter decorator
+function LogParamenter(
+    target: any,
+    propertyKey: string,
+    parameterIndex: number,
+) {
+    c('target: ',target);
+    c('propertyKey: ',propertyKey);
+    c('parameterIndex: ' ,parameterIndex);
+}
+
+class Demo {
+    public foo(@LogParamenter a: any,  b: any) {
+        c("Hi");
+    }
+}
+
+const test = new Demo();
+test.foo("Aaaa", "Bbbb");
