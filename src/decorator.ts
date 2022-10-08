@@ -1,74 +1,85 @@
 const c = console.log;
 
-// class decorator
-function setProperty(ctr: Function) {
-    ctr.prototype.id = Math.random().toString();
-    ctr.prototype.dateCreated = new Date().toLocaleString();
+// Param
+// target: Hàm được decorator
+// propertyKey: Tên `property` được decorator
+// parameterIndex: Index của tham số được decorator
+// descriptor: Object mô tả cấu hình của đối tượng được decorator
+
+/* ------------------------------Class decorator START---------------------------- */
+// Nó chỉnh sửa hoặc thêm `objects prototype` cho contructor của class
+// param(target)
+function createPrototype(target: Function) {
+    // Tạo `objects prototype`
+    target.prototype.greet = function () {
+        return 'Hello ';
+    }
 }
 
-@setProperty
+@createPrototype
 class User {
     constructor(public name: string) { }
 }
 
 const user1 = new User('Khoa');
-// c(user1);
+c(user1);
+c(user1.constructor.prototype.greet() + user1.name);
+/* ------------------------------Class decorator END---------------------------- */
 
-// method decorator
-function autoBind(target: any, methodName: string, descriptor: PropertyDescriptor) {
+/* ------------------------------Method decorator START---------------------------- */
+// Method Decorator được sử dụng để quan sát, sửa đổi hoặc thay thế định nghĩa của method
+
+// Param(target: Object, propertyKey: string, descriptor: TypedPropertyDescriptor)
+
+function autoBind(target: any, propertyKey: string, descriptor: PropertyDescriptor) {
     const originalMethod = descriptor.value;
     const adjDescripttor: PropertyDescriptor = {
-        configurable: true,
-        enumerable: false,
         get() {
-            const boundFn = originalMethod.bind(this);
-            return boundFn;
+            const boundFunction = originalMethod.bind(this);
+            return boundFunction;
         }
     }
     return adjDescripttor;
-} // autoBind
+}
 
 class Person {
     private name: string;
-    private age: number;
 
-    constructor(n: string, a: number) {
-        this.name = n;
-        this.age = a;
+    constructor(name: string) {
+        this.name = name;
     }
+
     @autoBind
     getName() {
         c(this.name);
     }
 }
 
-const person1 = new Person('Khoa', 16);
-person1.getName()
+const person1 = new Person('Khoa');
+person1.getName();
+/* ------------------------------Method decorator END---------------------------- */
 
+/* ------------------------------Property decorator START---------------------------- */
+// Property decorator được sử dụng để quan sát, sửa đổi hoặc thêm các phương thức hoặc thuộc tính vào class
+// Param(target: Object, propertyKey: string)
+function propertyChange(target: Object, propertyKey: string) {
+    let result = propertyKey;
 
-// Property decorator
-function propertyChange(target: any, key: string) {
-
-    let result = target[key];
-
-    const getFunc = function () {
+    const getFunction = function () {
         return result;
     };
 
-    const setFunc = function (newResult: string) {
+    const setFunction = function (newResult: string) {
         result = `Hello ${newResult}`;
-
         return result;
     };
 
     const description = {
-        enumerable: true,
-        configurable: true,
-        get: getFunc,
-        set: setFunc
+        get: getFunction,
+        set: setFunction
     }
-
-    Object.defineProperty(target, key, description);
+   
+    Object.defineProperty(target, propertyKey, description);
 }
 
 class PersonX {
@@ -78,12 +89,16 @@ class PersonX {
     public lastName: string = "Khoa";
 }
 
-const employeeInstance = new PersonX();
-// c(employeeInstance);
+const me = new PersonX();
+c(me);
+/* ------------------------------Property decorator END---------------------------- */
 
+/* ------------------------------Accessor decorator START---------------------------- */
+// Dùng để decorator cho accessor cho property (chỉ định nghĩa cho getter hoặc setter)
 
-// accessor decorator
-function Enumerable(target: any, propertyKey: string, descriptor: PropertyDescriptor) {
+// Param(target: Object, propertyKey: string, descriptor: TypedPropertyDescriptor)
+
+function writable(target: Object, propertyKey: string, descriptor: PropertyDescriptor) {
     Object.defineProperty(target, `_${propertyKey}`, {
         writable: true
     });
@@ -91,12 +106,12 @@ function Enumerable(target: any, propertyKey: string, descriptor: PropertyDescri
 
 class PersonN {
     _name: string;
-    
+
     constructor(name: string) {
         this._name = name;
     }
 
-    @Enumerable
+    @writable
     get name() {
         return this._name;
     }
@@ -104,25 +119,26 @@ class PersonN {
 
 let person = new PersonN("Khoa");
 person._name = 'Tèo';
-// c(person);
+c(person);
+/* ------------------------------Accessor decorator END---------------------------- */
 
+/* ------------------------------Parameter decorator START---------------------------- */
+// Parameter decorator chỉ sử dụng để kiểm tra sự tồn tại của params trong function 
 
-// parameter decorator
-function LogParamenter(
-    target: any,
-    propertyKey: string,
-    parameterIndex: number,
-) {
-    c('target: ',target);
-    c('propertyKey: ',propertyKey);
-    c('parameterIndex: ' ,parameterIndex);
+// Param(target: Object, propertyKey: string, parameterIndex: number) 
+
+function LogParamenter(target: Object, propertyKey: string, parameterIndex: number) {
+    c('target: ', target); 
+    c('propertyKey: ', propertyKey);
+    c('parameterIndex: ', parameterIndex); 
 }
 
 class Demo {
-    public foo(@LogParamenter a: any,  b: any) {
+    public foo(@LogParamenter a: any, b: any) {
         c("Hi");
     }
 }
 
 const test = new Demo();
 test.foo("Aaaa", "Bbbb");
+/* ------------------------------Parameter decorator END---------------------------- */
