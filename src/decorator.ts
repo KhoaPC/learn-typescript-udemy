@@ -10,52 +10,49 @@ const c = console.log;
 // Nó chỉnh sửa hoặc thêm `objects prototype` cho contructor của class
 // param(target)
 function createPrototype(target: Function) {
-    // Tạo `objects prototype`
-    target.prototype.greet = function () {
-        return 'Hello ';
-    }
+    // Auto generate prop 'timeCreated'
+    target.prototype.timeCreated = new Date();
+
+    target.prototype.greet = function (someOne: string) {
+        console.log(`Hello ${someOne} from prototype.greet()`);
+    } // greet
 }
 
 @createPrototype
 class User {
+    // For passing error
+    // `Property ### does not exist on type ###` by TypeScript compiler
+    [decoratorGeneratedKey: string]: any; // **
     constructor(public name: string) { }
 }
 
 const user1 = new User('Khoa');
-c(user1);
-c(user1.constructor.prototype.greet() + user1.name);
+// user1.greet('Khoa');
+// console.log(`User ${user1.name} was created at ${user1.timeCreated}`);
 /* ------------------------------Class decorator END---------------------------- */
 
 /* ------------------------------Method decorator START---------------------------- */
 // Method Decorator được sử dụng để quan sát, sửa đổi hoặc thay thế định nghĩa của method
 // Param(target: Object, propertyKey: string, descriptor: TypedPropertyDescriptor)
 
-function autoBind(target: any, propertyKey: string, descriptor: PropertyDescriptor) {
-    const originalMethod = descriptor.value;
-    const adjDescripttor: PropertyDescriptor = {
-        get() {
-            const boundFunction = originalMethod.bind(this);
-            return boundFunction;
-        }
-    }
-    return adjDescripttor;
-}
+function replaceMethod(target: any, propertyKey: string, descriptor: PropertyDescriptor) {
+    let originalMethod = descriptor.value;
 
-class Person {
-    private name: string;
-
-    constructor(name: string) {
-        this.name = name;
-    }
-
-    @autoBind
-    getName() {
-        c(this.name);
+    originalMethod = function () {
+        c('Damned');
     }
 }
 
-const person1 = new Person('Khoa');
-person1.getName();
+class Yoo {
+    @replaceMethod
+    greet() {
+        c('Hello');
+    }
+}
+
+const yoo1 = new Yoo();
+yoo1.greet();
+
 /* ------------------------------Method decorator END---------------------------- */
 
 /* ------------------------------Property decorator START---------------------------- */
@@ -126,9 +123,9 @@ c(person);
 /* ------------------------------Accessor decorator END---------------------------- */
 
 /* ------------------------------Parameter decorator START---------------------------- */
-// Parameter decorator chỉ sử dụng để kiểm tra params trong function 
+// Parameter decorator chỉ sử dụng để kiểm tra params trong function
 
-// Param(target: Object, propertyKey: string, parameterIndex: number) 
+// Param(target: Object, propertyKey: string, parameterIndex: number)
 
 function LogParamenter(target: Object, propertyKey: string, parameterIndex: number) {
     c('target: ', target);
