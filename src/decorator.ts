@@ -28,7 +28,6 @@ c(user1.constructor.prototype.greet() + user1.name);
 
 /* ------------------------------Method decorator START---------------------------- */
 // Method Decorator được sử dụng để quan sát, sửa đổi hoặc thay thế định nghĩa của method
-
 // Param(target: Object, propertyKey: string, descriptor: TypedPropertyDescriptor)
 
 function autoBind(target: any, propertyKey: string, descriptor: PropertyDescriptor) {
@@ -78,7 +77,7 @@ function propertyChange(target: Object, propertyKey: string) {
         get: getFunction,
         set: setFunction
     }
-   
+
     Object.defineProperty(target, propertyKey, description);
 }
 
@@ -94,10 +93,14 @@ c(me);
 /* ------------------------------Property decorator END---------------------------- */
 
 /* ------------------------------Accessor decorator START---------------------------- */
-// Dùng để decorator cho accessor cho property (chỉ định nghĩa cho getter hoặc setter)
-
+// Dùng để thay accessor cho property (chỉ định nghĩa cho getter hoặc setter)
+/* Accessor:
+- configurable
+- enumerable
+- value
+- writable
+*/
 // Param(target: Object, propertyKey: string, descriptor: TypedPropertyDescriptor)
-
 function writable(target: Object, propertyKey: string, descriptor: PropertyDescriptor) {
     Object.defineProperty(target, `_${propertyKey}`, {
         writable: true
@@ -123,14 +126,14 @@ c(person);
 /* ------------------------------Accessor decorator END---------------------------- */
 
 /* ------------------------------Parameter decorator START---------------------------- */
-// Parameter decorator chỉ sử dụng để kiểm tra sự tồn tại của params trong function 
+// Parameter decorator chỉ sử dụng để kiểm tra params trong function 
 
 // Param(target: Object, propertyKey: string, parameterIndex: number) 
 
 function LogParamenter(target: Object, propertyKey: string, parameterIndex: number) {
-    c('target: ', target); 
+    c('target: ', target);
     c('propertyKey: ', propertyKey);
-    c('parameterIndex: ', parameterIndex); 
+    c('parameterIndex: ', parameterIndex);
 }
 
 class Demo {
