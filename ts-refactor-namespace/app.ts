@@ -8,6 +8,7 @@
 /// <reference path="components/project-list.ts"/>
 /// <reference path="components/project-input.ts"/>
 
+const c = console.log;
 
 namespace App {
     new ProjectInput();
