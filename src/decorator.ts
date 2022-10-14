@@ -36,10 +36,11 @@ const user1 = new User('Khoa');
 // Param(target: Object, propertyKey: string, descriptor: TypedPropertyDescriptor)
 
 function replaceMethod(target: any, propertyKey: string, descriptor: PropertyDescriptor) {
+    // Lấy phương thức được decorator
     let originalMethod = descriptor.value;
 
-    originalMethod = function () {
-        c('Damned');
+    originalMethod = () => {
+        c('Hi');
     }
 }
 
@@ -58,30 +59,30 @@ yoo1.greet();
 /* ------------------------------Property decorator START---------------------------- */
 // Property decorator được sử dụng để quan sát, sửa đổi hoặc thêm các phương thức hoặc thuộc tính vào class
 // Param(target: Object, propertyKey: string)
-function propertyChange(target: Object, propertyKey: string) {
-    let result = propertyKey;
 
-    const getFunction = function () {
+// Sửa đổi property được decorator
+function propertyChange(target: Object, propertyKey: string) {
+    let result = '';
+
+    const getFunction = () => {
         return result;
     };
 
-    const setFunction = function (newResult: string) {
+    const setFunction = (newResult: string) => {
         result = `Hello ${newResult}`;
         return result;
     };
 
-    const description = {
+    Object.defineProperty(target, propertyKey, {
         get: getFunction,
         set: setFunction
-    }
-
-    Object.defineProperty(target, propertyKey, description);
+    });
 }
 
 class PersonX {
     public firstname: string = 'Luong';
 
-    @propertyChange
+    @propertyChange 
     public lastName: string = "Khoa";
 }
 
@@ -98,7 +99,10 @@ c(me);
 - writable
 */
 // Param(target: Object, propertyKey: string, descriptor: TypedPropertyDescriptor)
-function writable(target: Object, propertyKey: string, descriptor: PropertyDescriptor) {
+
+// Thay đổi giá trị thuộc tính mặc định của property
+function writable(target: Object, propertyKey: string) {
+    // Mặc định là sau khi khởi tạo thì không được thay đổi. Đổi thành có thể thay đổi
     Object.defineProperty(target, `_${propertyKey}`, {
         writable: true
     });
@@ -118,6 +122,7 @@ class PersonN {
 }
 
 let person = new PersonN("Khoa");
+// 
 person._name = 'Tèo';
 c(person);
 /* ------------------------------Accessor decorator END---------------------------- */
@@ -127,6 +132,7 @@ c(person);
 
 // Param(target: Object, propertyKey: string, parameterIndex: number)
 
+// Quan sát các tham số
 function LogParamenter(target: Object, propertyKey: string, parameterIndex: number) {
     c('target: ', target);
     c('propertyKey: ', propertyKey);
