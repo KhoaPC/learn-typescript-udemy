@@ -1,73 +1,110 @@
 const c = console.log;
 
+// Ví dụ từng trường hợp sửa đổi, thay thế
+
 // Param
-// target: Hàm được decorator
+// target: Đối tượng được decorator
 // propertyKey: Tên `property` được decorator
 // parameterIndex: Index của tham số được decorator
 // descriptor: Object mô tả cấu hình của đối tượng được decorator
 
 /* ------------------------------Class decorator START---------------------------- */
-// Nó chỉnh sửa hoặc thêm `objects prototype` cho contructor của class
-// param(target)
+// Thêm `objects prototype` cho contructor của class
+// Param(target)
 function createPrototype(target: Function) {
-    // Auto generate prop 'timeCreated'
-    target.prototype.timeCreated = new Date();
+    // Tự động tạo prototype property `timeCreated` cho class được decorator
+    target.prototype.timeCreated = new Date().toLocaleDateString();
 
-    target.prototype.greet = function (someOne: string) {
-        console.log(`Hello ${someOne} from prototype.greet()`);
+    // Tự động tạo prototype method `greet` cho class được decorator
+    target.prototype.greet = (someOne: string) => {
+        c(`Hello ${someOne} from prototype.greet()`);
     } // greet
-}
+} // createPrototype
 
 @createPrototype
 class User {
-    // For passing error
-    // `Property ### does not exist on type ###` by TypeScript compiler
-    [decoratorGeneratedKey: string]: any; // **
+    // Bỏ qua lỗi `Property ### does not exist on type ###`
+    // Key do decorator tạo ra
+    [decoratorGeneratedKey: string]: any;
     constructor(public name: string) { }
 }
 
 const user1 = new User('Khoa');
-// user1.greet('Khoa');
-// console.log(`User ${user1.name} was created at ${user1.timeCreated}`);
+user1.greet('Khoa'); // Hello Khoa from prototype.greet()
+c(`User ${user1.name} was created at ${user1.timeCreated}`); // User Khoa was created at ...
 /* ------------------------------Class decorator END---------------------------- */
 
 /* ------------------------------Method decorator START---------------------------- */
-// Method Decorator được sử dụng để quan sát, sửa đổi hoặc thay thế định nghĩa của method
-// Param(target: Object, propertyKey: string, descriptor: TypedPropertyDescriptor)
+// Method Decorator được sử dụng để sửa đổi hoặc thay thế định nghĩa của method
+// Params(target: Object, propertyKey: string, descriptor: PropertyDescriptor)
 
-function replaceMethod(target: any, propertyKey: string, descriptor: PropertyDescriptor) {
+// Sửa đổi phương thức được decorator
+function modifyMethod(target: any, propertyKey: string, descriptor: PropertyDescriptor) {
     // Lấy phương thức được decorator
     let originalMethod = descriptor.value;
 
-    originalMethod = () => {
+    // Sửa đổi phương thức được decorator
+    //originalMethod ??
+    descriptor.value = function (...args: any[]) { //=> ??
+        // args = tham số được truyền vào khi gọi hàm được decorator      
+        c('Before greet');
+        // Gọi phương thức được decorator
+        let result = originalMethod.apply({}, args);
+        c('After greet');
+        return result;
+    }
+}
+
+// Thay thế phương thức được decorator
+function replaceMethod(target: any, propertyKey: string, descriptor: PropertyDescriptor) {
+    // Lấy phương thức được decorator
+    let originalMethod = descriptor.value;
+    // ??
+    // Thay thế 
+    descriptor.value = () => {
         c('Hi');
     }
 }
 
 class Yoo {
+    // Sửa đổi 
+    @modifyMethod
+    greet1(message: string, name: string) {
+        c(`Greet: ${message} ${name}`);
+    }
+    // Thay thế
     @replaceMethod
-    greet() {
+    greet2() {
         c('Hello');
     }
 }
 
 const yoo1 = new Yoo();
-yoo1.greet();
+yoo1.greet1('Hello', 'Khoa');
+// Before greet
+// Greet: Hello Khoa
+// After greet
+
+yoo1.greet2(); // Hi
+
+
 
 /* ------------------------------Method decorator END---------------------------- */
 
 /* ------------------------------Property decorator START---------------------------- */
-// Property decorator được sử dụng để quan sát, sửa đổi hoặc thêm các phương thức hoặc thuộc tính vào class
+// Property decorator được sử dụng để sửa đổi hoặc thêm các phương thức vào class
 // Param(target: Object, propertyKey: string)
 
 // Sửa đổi property được decorator
 function propertyChange(target: Object, propertyKey: string) {
     let result = '';
-
+    // Getter
     const getFunction = () => {
         return result;
     };
 
+    // Setter (sửa đổi property được decorator)
+    // `newResult` là value của property được decorator
     const setFunction = (newResult: string) => {
         result = `Hello ${newResult}`;
         return result;
@@ -79,15 +116,49 @@ function propertyChange(target: Object, propertyKey: string) {
     });
 }
 
-class PersonX {
-    public firstname: string = 'Luong';
+// Thêm method cho property được decorator
+function checkLengthProperty(minimum: number) {
+    // Decorator factory
+    return (target: Object, propertyKey: string) => {
+        let result: string = '';
 
-    @propertyChange 
+        // Getter
+        const getFunction = () => {
+            return result;
+        };
+
+        // Setter (Thêm method cho property được decorator)
+        // `newResult` là value của property được decorator
+        const setFunction = (newResult: string) => {
+            // Kiểm tra xem length giá trị của property được decorator lớn hơn `minimum` hay không 
+            if (newResult.length < minimum) {
+                console.warn(`Your name should be bigger than ${minimum}`);
+            }
+            return result = newResult;
+        }
+
+        //
+        Object.defineProperty(target, propertyKey, {
+            get: getFunction,
+            set: setFunction
+        });
+    }
+}
+
+class PersonX {
+    // Thêm medhod kiểm tra property
+    @checkLengthProperty(2)
+    public firstname: string = 'L';
+    // Thay đổi property
+    @propertyChange
     public lastName: string = "Khoa";
 }
 
 const me = new PersonX();
-c(me);
+c(me.lastName); // Hello Khoa
+c(me.firstname);
+// Warning: Your name should be bigger than 2 
+// L
 /* ------------------------------Property decorator END---------------------------- */
 
 /* ------------------------------Accessor decorator START---------------------------- */
@@ -98,53 +169,39 @@ c(me);
 - value
 - writable
 */
-// Param(target: Object, propertyKey: string, descriptor: TypedPropertyDescriptor)
+// Params(target: Object, propertyKey: string, descriptor: PropertyDescriptor)
 
-// Thay đổi giá trị thuộc tính mặc định của property
-function writable(target: Object, propertyKey: string) {
-    // Mặc định là sau khi khởi tạo thì không được thay đổi. Đổi thành có thể thay đổi
-    Object.defineProperty(target, `_${propertyKey}`, {
-        writable: true
-    });
-}
 
-class PersonN {
-    _name: string;
 
-    constructor(name: string) {
-        this._name = name;
-    }
-
-    @writable
-    get name() {
-        return this._name;
-    }
-}
-
-let person = new PersonN("Khoa");
-// 
-person._name = 'Tèo';
-c(person);
 /* ------------------------------Accessor decorator END---------------------------- */
 
 /* ------------------------------Parameter decorator START---------------------------- */
 // Parameter decorator chỉ sử dụng để kiểm tra params trong function
 
-// Param(target: Object, propertyKey: string, parameterIndex: number)
+// Params(target: Object, propertyKey: string, parameterIndex: number)
 
-// Quan sát các tham số
+// Quan sát tham số được decorator
 function LogParamenter(target: Object, propertyKey: string, parameterIndex: number) {
+    // In ra các các tham số
     c('target: ', target);
     c('propertyKey: ', propertyKey);
     c('parameterIndex: ', parameterIndex);
 }
 
 class Demo {
+    // Sử dụng phía trước tham số cần decorator
     public foo(@LogParamenter a: any, b: any) {
-        c("Hi");
+        c(a, b);
     }
 }
 
 const test = new Demo();
-test.foo("Aaaa", "Bbbb");
+test.foo("foo", "bar");
+/*
+target:  {constructor: ƒ, foo: ƒ}
+propertyKey:  foo
+parameterIndex:  0
+foo bar
+*/
+
 /* ------------------------------Parameter decorator END---------------------------- */
