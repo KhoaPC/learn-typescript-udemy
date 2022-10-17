@@ -1,30 +1,30 @@
 const c = console.log;
 
-function add(n1: number, n2: number) {
+// Khai báo type cho các tham số 
+// và khai báo hàm sẽ trả về kiểu gì
+function add(n1: number, n2: number): number {
     return n1 + n2;
 }
 
-function printResult(any): void {
+// void: hàm không trả về 
+// In ra cái gì đó
+function printResult(any: any): void {
     c(`Result ${any}`);
 }
 
-let func: (a: number, b: number) => number;
-func = add;
-// func = printResult; //Error
-
-c(func(1,9));
-
+// Thêm callback vào tham số
 function addAndHandles(
     n1: number,
     n2: number,
     callBacks: (a: number, b: number) => void
 ) {
-    const result = n1 + n2;
+    const result1 = n1 + n2;
     const result2 = n1 - n2;
-    callBacks(result, result2);
+    callBacks(result1, result2);
 }
 
-addAndHandles(10, 10, (result, result2) => {
-    c(result * result2);
-    // return;
+addAndHandles(10, 10, (result1, result2) => {
+    c(result1) // 20
+    c(result2) // 0
+    c(result1 * result2); // 0 
 });
