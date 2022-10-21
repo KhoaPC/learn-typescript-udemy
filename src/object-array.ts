@@ -1,31 +1,41 @@
-// Obj & Arr 
 const c = console.log;
-enum Role {ADMIN, AUTHOR} // enumuration
+// Obj & Arr 
+
+// Tuple:: mảng có số phần tử và type của từng thành phần cố định
+let personX: [string, number, boolean];
+personX = ['Khoa', 16, true]; 
+// personX = ['Khoa', 16, 'Hi']; // Error
+
+let arrString: string[]; // Mảng gồm các chuổi 
+arrString = ['Pork', 'Chicken'];
+
+let arrMixed: any[]; // Mảng hổn hợp
+arrMixed = ['Dog', 'Cat', 2, true];
+
+// Enum (enumuration): một nhóm các giá trị không thay đổi
+enum Role { ADMIN, AUTHOR } 
 
 const person: {
     name: string;
     age: number;
-    favoriteAnimal: string[];
-    misc: [number, string]; //tuples: is a predefined array of length and type of each elm
+    favoriteAnimals: string[]; 
+    misc: [number, string]; // tuples
     role: number;
 } = {
     name: 'Khoa',
     age: 16,
-    favoriteAnimal: ['Dog', 'Cat'],
-    misc: [1, 'Hello'], 
-    role: Role.ADMIN,  
+    favoriteAnimals: ['Dog', 'Cat'],
+    misc: [1, 'Hello'],
+    // Sử dụng enum
+    role: Role.ADMIN,
 } 
 
-// c(person.gender); //Error 
-
-let foo: string[]; 
-foo = ['Pork', 'Chicken'];
-
-let bar: any[];
-bar = ['Dog', 'Cat', 2, true];
-
-person.favoriteAnimal.forEach(item => {
-    c(item.toUpperCase());
-    // c(item.map());
+// Xác định được kiểu dử liệu của item và đề xuất method cho kiểu dữ liệu đó
+c(person.name.toUpperCase()); // KHOA
+person.favoriteAnimals.forEach(item => {
+   c('Favorite animals:', item.toUpperCase()); 
+   // Favorite animals: DOG
+   // Favorite animals: CAT
+    // c(item.map()); // Error
 });
 
