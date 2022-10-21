@@ -82,15 +82,17 @@ c(Person.year); //2022
 
 // Intersection Types: Giúp ta tạo một type bao gồm các type mà chúng ta đã tạo trước đó.
 // Có 2 class có các thuộc tính khác nhau
-class PersonX {
+type PersonX = {
     name: string;
     age: number;
 }
-class Id {
+type Id = {
     id: string;
 }
-// & : kết hợp thuộc tính 2 class
-let employeeX: PersonX & Id = {
+// Gộp vào 1 type
+type PersonXX = PersonX & Id;
+
+const person1: PersonXX = {
     name: 'Luong Van Teo',
     age: 11,
     id: '290200'

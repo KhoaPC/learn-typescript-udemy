@@ -12,13 +12,9 @@ let arrN = foo('Hello', 456789);
 // arrN[0] = arrN[0].toUpperCase(); // Error `Property 'toUpperCase' does not exist on type 'NS'`
 // c(arrN[1] + 54321); // Error `Operator '+' cannot be applied to types 'NS''.
 
-// Example #1
-
-// Example #2
 function generic<T, U>(a: T, b: U): [T, U] {
   return [a, b]
 }
-
 // Khi khởi tạo arr1 TS biết được `T` = string `U` = number
 let arr1 = generic('Hi', 456789);
 // Có thể sử dụng các method của `string` 
