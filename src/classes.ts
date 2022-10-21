@@ -79,3 +79,19 @@ me.addFavoriteColor('Green'); // Add
 me.printFavoriteColor(); //  ['Blue', 'Green']
 // Sử dụng property static
 c(Person.year); //2022
+
+// Intersection Types: Giúp ta tạo một type bao gồm các type mà chúng ta đã tạo trước đó.
+// Có 2 class có các thuộc tính khác nhau
+class PersonX {
+    name: string;
+    age: number;
+}
+class Id {
+    id: string;
+}
+// & : kết hợp thuộc tính 2 class
+let employeeX: PersonX & Id = {
+    name: 'Luong Van Teo',
+    age: 11,
+    id: '290200'
+}
