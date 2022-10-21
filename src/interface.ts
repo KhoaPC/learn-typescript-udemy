@@ -11,13 +11,23 @@ add = (n1:number, n2: number) => {
     return n1 + n2;
 }
 
+interface foo {
+    foo?: string
+}
+
 interface Named {
-    readonly name: string; // readonly: declared only once when initialized.can be accessed outside of classes but cannot be changed
+    readonly name: string;
     outputName?: string; // ? Optional Parameters
 }
 
-interface Greetable extends Named {
+interface Greetable extends Named, foo {
     hi(text: string): void;
+}
+
+const obj: Greetable = {
+    foo: '',
+    name: '',
+    hi: () => {}
 }
 
 class Person implements Greetable, Named {

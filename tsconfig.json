@@ -110,7 +110,7 @@
     "*.dev.ts"
   ],
   "include": [
-    // "src/app.ts",
-    "ts-refactor-modules/app.ts",
+    "src/app.ts",
+    // "ts-refactor-modules/app.ts",
   ]
 }
