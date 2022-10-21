@@ -1,7 +1,4 @@
 const c = console.log;
-
-// Ví dụ từng trường hợp sửa đổi, thay thế
-
 // Param
 // target: Đối tượng được decorator
 // propertyKey: Tên `property` được decorator
@@ -86,9 +83,6 @@ yoo1.greet1('Hello', 'Khoa');
 // After greet
 
 yoo1.greet2(); // Hi
-
-
-
 /* ------------------------------Method decorator END---------------------------- */
 
 /* ------------------------------Property decorator START---------------------------- */
@@ -163,16 +157,46 @@ c(me.firstname);
 
 /* ------------------------------Accessor decorator START---------------------------- */
 // Dùng để thay accessor cho property (chỉ định nghĩa cho getter hoặc setter)
+// *cờ: là các thuộc tính enumerable, value, writable
 /* Accessor:
-- configurable
-- enumerable
-- value
-- writable
+- configurable: là true thì có thế cấu hình các *cờ khác và ngược lại
+- enumerable: nếu là true thì thuộc tính có thể dùng trong vòng lặp, và ngược lại.
+- value: là true thì ?`thuộc tính có thể xóa`? và các cờ* khác có thể thay đổi, ngược lại thì không.
+- writable: nếu là true thì giá trị value của thuộc tính có thể thay đổi và ngược lại
 */
 // Params(target: Object, propertyKey: string, descriptor: PropertyDescriptor)
 
 
 
+function Enumerable(target: any, propertyKey: string, descriptor: PropertyDescriptor) {
+    // set enumerable
+    descriptor.enumerable = true;
+    
+}
+
+class Person {
+    [decoratorGeneratedKey: string]: any; // Key do decorator tạo ra
+    _name: string;
+    constructor(name: string) {
+        this._name = name;
+    }
+
+    @Enumerable
+    get name() {
+        // In `descriptor` của class ra
+        c(Object.getOwnPropertyDescriptor(Person.prototype, 'name'));
+        // {set: undefined, enumerable: true, configurable: true, get: ƒ}
+        return this._name;
+    }
+
+}
+let person = new Person('Khoa');
+
+for (let key in person) {
+    c(key + " = " + person[key]); 
+    // _name = Khoa
+    // name = Khoa
+}
 /* ------------------------------Accessor decorator END---------------------------- */
 
 /* ------------------------------Parameter decorator START---------------------------- */
